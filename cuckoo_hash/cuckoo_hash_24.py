@@ -38,7 +38,7 @@ class CuckooHash24:
     # you may however define additional instance variables inside the __init__ method.
 
     def insert(self, key: int) -> bool:
-        shuffle_count = -1
+        shuffle_count = 0
         table_id = 0
         original_state = deepcopy(self.get_table_contents())
         while True:
