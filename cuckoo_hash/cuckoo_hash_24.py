@@ -39,11 +39,10 @@ class CuckooHash24:
 	def insert(self, key: int) -> bool:
 		shuffle_count = -1
 		table_id = 0
-		original_state = deepcopy(self.get_table_contents())
+		orgKey = key
 		while True:
 			shuffle_count += 1
 			if shuffle_count > self.CYCLE_THRESHOLD:
-				self.tables = deepcopy(original_state)
 				return False
 			else:
 				table_x = table_id
