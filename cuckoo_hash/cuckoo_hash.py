@@ -27,7 +27,7 @@ class CuckooHash:
 		table_id = 0
 		while True:
 			shuffle_count += 1
-			if shuffle_count>self.CYCLE_THRESHOLD:
+			if shuffle_count > self.CYCLE_THRESHOLD:
 				return False
 			else:
 				index = self.hash_func(key, table_id)
