@@ -43,7 +43,7 @@ class CuckooHash24:
 		while True:
 			shuffle_count += 1
 			if shuffle_count > self.CYCLE_THRESHOLD:
-				self.tables = original_state
+				self.tables = deepcopy(original_state)
 				return False
 			else:
 				table_x = table_id
