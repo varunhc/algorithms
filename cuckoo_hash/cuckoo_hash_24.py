@@ -55,8 +55,8 @@ class CuckooHash24:
                     self.tables[table_id][index_x].append(key)
                     return True
                 pop_index = self.get_rand_idx_from_bucket(index_x, table_id)
-                popped = self.tables[table_id][index_x].pop(pop_index)
-                self.tables[table_id][index_x].append(key)
+                popped = self.tables[table_id][index_x][pop_index]
+                self.tables[table_id][index_x][pop_index] = key
                 key = popped
                 table_id = table_id ^ 1
 
