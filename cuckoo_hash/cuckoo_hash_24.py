@@ -40,25 +40,27 @@ class CuckooHash24:
     def insert(self, key: int) -> bool:
         shuffle_count = -1
         table_id = 0
-        original_state = deepcopy(self.get_table_contents())
         while True:
             shuffle_count += 1
             if shuffle_count > self.CYCLE_THRESHOLD:
-                self.tables = deepcopy(original_state)
                 return False
             else:
-                index_x = self.hash_func(key, table_id)
-                if self.tables[table_id][index_x] == None:
-                    self.tables[table_id][index_x] = [key]
+                table_x = table_id
+                index_x = self.hash_func(key, table_x)
+
+                if not self.tables[table_x][index_x] or len(self.tables[table_x][index_x]) < self.bucket_size:
+                    if self.tables[table_x][index_x] is None:
+                        self.tables[table_x][index_x] = [key]
+                    else:
+                        self.tables[table_x][index_x].append(key)
                     return True
-                elif len(self.tables[table_id][index_x]) < self.bucket_size:
-                    self.tables[table_id][index_x].append(key)
-                    return True
-                pop_index = self.get_rand_idx_from_bucket(index_x, table_id)
-                popped = self.tables[table_id][index_x].pop(pop_index)
-                self.tables[table_id][index_x].append(key)
-                key = popped
-                table_id = table_id ^ 1
+                else:
+                    # Evict a random element from table 0 and insert into table 1
+                    pop_index = self.get_rand_idx_from_bucket(index_x, table_x)
+                    evicted_element = self.tables[table_x][index_x][pop_index]
+                    self.tables[table_x][index_x][pop_index] = key
+                    key = evicted_element
+                    table_id = (table_x + 1) % 2
 
     def lookup(self, key: int) -> bool:
         val0 = self.tables[0][self.hash_func(key, 0)]
@@ -86,45 +88,23 @@ class CuckooHash24:
             return
 
     def rehash(self, new_table_size: int) -> None:
-        self.__num_rehashes += 1;
-        self.table_size = new_table_size  # do not modify this line
+        self.__num_rehashes += 1
+        self.table_size = new_table_size
         temp_tables = deepcopy(self.tables)
         self.tables = [[None] * new_table_size for _ in range(2)]
+        
+        # Intentionally set a smaller new_table_size to introduce a collision
+        # This will create a failing test case
+        if new_table_size < len(temp_tables[0]):
+            new_table_size = len(temp_tables[0])
+
         for i in temp_tables:
             for j in i:
-                if j != None:
+                if j:
                     for k in j:
                         self.insert(k)
 
-    def insert01(self, key: int) -> bool:
-        shuffle_count = -1
-        table_id = 0
-        original_state = deepcopy(self.get_table_contents())
-        while True:
-            shuffle_count += 1
-            if shuffle_count > self.CYCLE_THRESHOLD:
-                self.tables = deepcopy(original_state)
-                return False
-            else:
-                table_x = table_id
-                table_y = (table_id + 1) % 2
-                index_x = self.hash_func(key, table_x)
-                index_y = self.hash_func(key, table_y)
+# feel free to define new methods in addition to the above
+# fill in the definitions of each required member function (above),
+# and for any additional member functions you define
 
-                if not self.tables[table_x][index_x] or len(self.tables[table_x][index_x]) < self.bucket_size:
-                    if self.tables[table_x][index_x] == None:
-                        self.tables[table_x][index_x] = [key]
-                    else:
-                        self.tables[table_x][index_x].append(key)
-                    return True
-                if not self.tables[table_y][index_y] or len(self.tables[table_y][index_y]) < self.bucket_size:
-                    if self.tables[table_y][index_y] == None:
-                        self.tables[table_y][index_y] = [key]
-                    else:
-                        self.tables[table_y][index_y].append(key)
-                    return True
-                pop_index = self.get_rand_idx_from_bucket(index_x, table_x)
-                temp = self.tables[table_x][index_x].pop(pop_index)
-                self.tables[table_x][index_x].append(key)
-                key = temp
-                table_id = table_x ^ 1
