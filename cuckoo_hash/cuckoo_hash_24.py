@@ -100,11 +100,11 @@ class CuckooHash24:
         # alternate implementation for cuckoo 24 which looks for an empty slot in both the tables
         shuffle_count = -1
         table_id = 0
-        original_state = deepcopy(self.get_table_contents())
+        # original_state = deepcopy(self.get_table_contents())
         while True:
             shuffle_count += 1
             if shuffle_count > self.CYCLE_THRESHOLD:
-                self.tables = deepcopy(original_state)
+                # self.tables = deepcopy(original_state)
                 return False
             else:
                 table_x = table_id
