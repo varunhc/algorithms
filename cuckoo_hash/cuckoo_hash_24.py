@@ -97,6 +97,7 @@ class CuckooHash24:
                         self.insert(k)
 
     def insert01(self, key: int) -> bool:
+        # alternate implementation for cuckoo 24 which looks for an empty slot in both the tables
         shuffle_count = -1
         table_id = 0
         original_state = deepcopy(self.get_table_contents())
