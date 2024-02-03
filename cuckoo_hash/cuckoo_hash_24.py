@@ -40,11 +40,11 @@ class CuckooHash24:
     def insert(self, key: int) -> bool:
         shuffle_count = -1
         table_id = 0
-        original_state = deepcopy(self.get_table_contents())
+        # original_state = deepcopy(self.get_table_contents())
         while True:
             shuffle_count += 1
             if shuffle_count > self.CYCLE_THRESHOLD:
-                self.tables = deepcopy(original_state)
+                # self.tables = deepcopy(original_state)
                 return False
             else:
                 index_x = self.hash_func(key, table_id)
@@ -125,7 +125,7 @@ class CuckooHash24:
                         self.tables[table_y][index_y].append(key)
                     return True
                 pop_index = self.get_rand_idx_from_bucket(index_x, table_x)
-                temp = self.tables[table_x][index_x].pop(pop_index)
-                self.tables[table_x][index_x].append(key)
-                key = temp
+                popped = self.tables[table_x][index_x][pop_index]
+                self.tables[table_x][index_x][pop_index] = key
+                key = popped
                 table_id = table_x ^ 1
